@@ -65,5 +65,21 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  }
+  },
+  "keywords": [
+    "react",
+    "query",
+    "tanstack",
+    "react-query",
+    "typescript",
+    "openapi",
+    "type-safe",
+    "query-key",
+    "automatic",
+    "actions",
+    "mutations",
+    "hooks",
+    "auto-save",
+    "infinite-scroll"
+  ]
 }
