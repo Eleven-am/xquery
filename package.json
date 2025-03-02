@@ -1,0 +1,69 @@
+{
+  "name": "@eleven-am/xquery",
+  "version": "0.0.19",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Roy OSSAI",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "license": "GPL-3.0",
+  "scripts": {
+    "test": "jest --coverage --verbose",
+    "build": "rimraf dist && tsc",
+    "lint": "eslint --ext .ts src",
+    "lint:fix": "eslint --fix --ext .ts src",
+    "copy": "cp package.json dist && cp LICENSE dist && cp tsconfig.json dist && cp README.md dist",
+    "push": "npm version patch && npm run copy && cd dist && npm publish && cd ..",
+    "pipeline": "npm run build && npm run push"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@tanstack/react-query": "^5.66.11",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@stylistic/eslint-plugin-ts": "^4.1.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.8",
+    "@types/react": "^19.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.25.0",
+    "@typescript-eslint/parser": "^8.25.0",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.2",
+    "eslint-import-resolver-node": "^0.3.9",
+    "eslint-plugin-file-progress": "^3.0.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.3",
+    "jest": "^29.7.0",
+    "prettier": "^3.5.2",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.6",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.3"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.test\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
