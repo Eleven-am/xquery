@@ -7,9 +7,15 @@ import {
     QueryRecord,
     MutationRecord,
 } from "./types";
-import {buildActionOptions, buildInfiniteOptions, buildMutationOptions, buildQueryKey} from "./queryBuilders";
 
-export function queryFactory<TClient, TError> ({ clientGetter, mapResponse, queryClientGetter }: QueryFactoryOptions<TClient, TError>) {
+import {buildActionOptions, buildInfiniteOptions, buildMutationOptions, buildQueryKey} from "./queryBuilders";
+import {QueryKey} from "@tanstack/query-core";
+
+function defaultMapQueryKey<TQueryKey extends QueryKey = QueryKey> (queryKey: TQueryKey) {
+    return queryKey;
+}
+
+export function queryFactory<TClient, TError> ({ clientGetter, mapResponse, mapQueryKey = defaultMapQueryKey, queryClientGetter }: QueryFactoryOptions<TClient, TError>) {
     function createQueries<
         TNamespace extends string,
         TRecord extends QueryRecord<TClient, TError>
@@ -26,9 +32,9 @@ export function queryFactory<TClient, TError> ({ clientGetter, mapResponse, quer
 
         for (const [key, value] of Object.entries(definition)) {
             if (typeof value === 'function') {
-                result[key] = (...params: any[]) => buildQueryKey(namespace, key, clientGetter, mapResponse, value(...params));
+                result[key] = (...params: any[]) => buildQueryKey(namespace, key, mapQueryKey, clientGetter, mapResponse, value(...params));
             } else {
-                result[key] = buildQueryKey(namespace, key, clientGetter, mapResponse, value);
+                result[key] = buildQueryKey(namespace, key, mapQueryKey, clientGetter, mapResponse, value);
             }
         }
 
@@ -68,9 +74,9 @@ export function queryFactory<TClient, TError> ({ clientGetter, mapResponse, quer
 
         for (const [key, value] of Object.entries(definition)) {
             if (typeof value === 'function') {
-                result[key] = (...params: any[]) => buildActionOptions(namespace, key, queryClientGetter, clientGetter, mapResponse, value(...params) as any);
+                result[key] = (...params: any[]) => buildActionOptions(namespace, key, mapQueryKey, queryClientGetter, clientGetter, mapResponse, value(...params) as any);
             } else {
-                result[key] = buildActionOptions(namespace, key, queryClientGetter, clientGetter, mapResponse, value as any);
+                result[key] = buildActionOptions(namespace, key, mapQueryKey, queryClientGetter, clientGetter, mapResponse, value as any);
             }
         }
 
@@ -93,9 +99,9 @@ export function queryFactory<TClient, TError> ({ clientGetter, mapResponse, quer
 
         for (const [key, value] of Object.entries(definition)) {
             if (typeof value === 'function') {
-                result[key] = (...params: any[]) => buildInfiniteOptions(namespace, key, queryClientGetter, clientGetter, mapResponse, value(...params));
+                result[key] = (...params: any[]) => buildInfiniteOptions(namespace, key, mapQueryKey, queryClientGetter, clientGetter, mapResponse, value(...params));
             } else {
-                result[key] = buildInfiniteOptions(namespace, key, queryClientGetter, clientGetter, mapResponse, value);
+                result[key] = buildInfiniteOptions(namespace, key, mapQueryKey, queryClientGetter, clientGetter, mapResponse, value);
             }
         }
 

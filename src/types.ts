@@ -240,11 +240,13 @@ export type InferInfiniteRecord<TNamespace extends string, T extends InfiniteRec
 
 export type QueryClientGetter = () => QueryClient;
 export type GetClientInstance<TClient> = (signal?: AbortSignal) => TClient;
+export type MapQueryKeyFn<TQueryKey extends QueryKey = QueryKey> = (queryKey: TQueryKey) => TQueryKey;
 export type ErrorMapperFn<TError> = (shouldToast: boolean) => <Data>(response: QueryResponse<Data, TError>) => Data;
 
 export interface QueryFactoryOptions<TClient, TError> {
     queryClientGetter: QueryClientGetter;
     clientGetter: GetClientInstance<TClient>;
+    mapQueryKey?: MapQueryKeyFn;
     mapResponse: (shouldToast: boolean) => <Data>(response: QueryResponse<Data, TError>) => Data;
 }
 

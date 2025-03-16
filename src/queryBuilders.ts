@@ -1,9 +1,16 @@
 import {
     BaseActionOptions,
-    BaseInfiniteOptions, DefinedActionDef,
+    BaseInfiniteOptions,
+    DefinedActionDef,
     DefinedQueryDef,
     ErrorMapperFn,
-    GetClientInstance, InferMutationOptions, InferQueryResult, MutationDef, PageResponse, QueryClientGetter,
+    GetClientInstance,
+    InferMutationOptions,
+    InferQueryResult,
+    MapQueryKeyFn,
+    MutationDef,
+    PageResponse,
+    QueryClientGetter,
     QueryResponse,
     UndefinedQueryDef,
     UseInfiniteScrollOptions
@@ -32,13 +39,14 @@ export function buildMutationFn<TData, TError, TVariables, TClient> (
 export function buildQueryKey <TNamespace, TError, TKey, Result, TClient> (
     namespace: TNamespace,
     key: TKey,
+    mapQueryKey: MapQueryKeyFn,
     clientGetter: GetClientInstance<TClient>,
     errorMapper: ErrorMapperFn<TError>,
     options: (DefinedQueryDef<Result, TError, TClient> | UndefinedQueryDef<Result, TError, TClient>),
 ): InferQueryResult<typeof options, TClient, TError, [TNamespace, TKey]> {
     const toastError = options.toastError || false;
     const oldQueryKey = options.queryKey || [];
-    const queryKey = [namespace, key, ...oldQueryKey];
+    const queryKey = mapQueryKey([namespace, key, ...oldQueryKey] as unknown as string[]);
     const queryFn = buildQueryFn(toastError, clientGetter, errorMapper, options.queryFn);
 
     return {
@@ -78,6 +86,7 @@ export function buildMutationOptions<TData, TError, TVariables, TClient> (
 export function buildActionOptions<TNamespace, TKey, Result, TError, Variables, TClient> (
     namespace: TNamespace,
     key: TKey,
+    mapQueryKey: MapQueryKeyFn,
     queryClient: QueryClientGetter,
     clientGetter: GetClientInstance<TClient>,
     errorMapper: ErrorMapperFn<TError>,
@@ -89,7 +98,7 @@ export function buildActionOptions<TNamespace, TKey, Result, TError, Variables, 
     TError> {
     const toastError = options.toastError ?? true;
     const oldQueryKey = options.queryKey || [];
-    const queryKey = [namespace, key, ...oldQueryKey];
+    const queryKey = mapQueryKey([namespace, key, ...oldQueryKey] as unknown as string[]);
     const keysToInvalidate = [queryKey, ...(options.invalidateKeys || [])];
     const mutationFn = buildMutationFn(toastError, clientGetter, errorMapper, options.mutationFn);
     const queryFn = buildQueryFn(toastError, clientGetter, errorMapper, options.queryFn);
@@ -121,13 +130,14 @@ export function buildActionOptions<TNamespace, TKey, Result, TError, Variables, 
 export function buildInfiniteOptions<DataType, TClient, TError, TQueryKey extends QueryKey> (
     namespace: string,
     propertyNamespace: string,
+    mapQueryKey: MapQueryKeyFn<TQueryKey>,
     queryClient: QueryClientGetter,
     clientGetter: GetClientInstance<TClient>,
     mapResponse: ErrorMapperFn<TError>,
     property: BaseInfiniteOptions<DataType, TQueryKey, TClient, TError>,
 ): UseInfiniteScrollOptions<DataType, TQueryKey> {
     const oldKey = property.queryKey || [];
-    const newKey = [namespace, propertyNamespace, ...oldKey] as unknown as TQueryKey;
+    const newKey = mapQueryKey([namespace, propertyNamespace, ...oldKey] as unknown as TQueryKey);
     const queryFn = ({ pageParam }: { pageParam?: number }) => property.queryFn(clientGetter(), pageParam || 1).then(mapResponse(property.toastError || false));
     const getNextPageParam = (data: PageResponse<DataType>) => data.page === data.totalPages ? null : data.page + 1;
 
