@@ -129,7 +129,7 @@ export type BaseActionConfig<TQueryData, TVariables, TClient, TError, TMutationD
         toastError?: boolean;
         invalidateKeys?: QueryKey[];
         onQuerySuccess?: (data: TQueryData) => void;
-        queryFn: (api: TClient) => Promise<QueryResponse<TQueryData, TError>>;
+        queryFn: (api: TClient, variables?: TMutationData) => Promise<QueryResponse<TQueryData, TError>>;
         mutationFn: (api: TClient, variables: TVariables) => Promise<QueryResponse<TMutationData, TError>>;
     }
     & Omit<UseQueryOptions<TQueryData, TError, TQueryData, TQueryKey>, 'queryKey' | 'queryFn'>

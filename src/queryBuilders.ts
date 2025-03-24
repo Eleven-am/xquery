@@ -101,15 +101,21 @@ export function buildActionOptions<TNamespace, TKey, Result, TError, Variables, 
     const queryKey = mapQueryKey([namespace, key, ...oldQueryKey] as unknown as string[]);
     const keysToInvalidate = [queryKey, ...(options.invalidateKeys || [])];
     const mutationFn = buildMutationFn(toastError, clientGetter, errorMapper, options.mutationFn);
-    const queryFn = buildQueryFn(toastError, clientGetter, errorMapper, options.queryFn);
+    const latestVariablesKey = [...queryKey, 'latestVariables'];
+
+    const queryFn = ({ signal }: { signal: AbortSignal }) => {
+        const latestVariables = queryClient().getQueryData(latestVariablesKey) as Result | undefined;
+        return options.queryFn(clientGetter(signal), latestVariables).then(errorMapper(toastError));
+    };
 
     const onSuccess = async (data: Result, variables: Variables, context: unknown) => {
         const promises = keysToInvalidate.map((queryKey) => queryClient().invalidateQueries({
             queryKey,
         }));
 
-        await Promise.all(promises);
+        await queryClient().setQueryData(latestVariablesKey, data);
         await options.onSuccess?.(data, variables, context);
+        await Promise.all(promises);
     };
 
     return {
